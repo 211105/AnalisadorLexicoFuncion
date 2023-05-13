@@ -9,12 +9,9 @@ variables = r'\b(int|float|boolean|string)\s+([a-zA-Z_, ]+)\b'
 punto_coma = r';'
 parentesis_apertura = r'\('
 parentesis_cierre = r'\)'
-parentesis_dobles_apertura = r'\(\('
-parentesis_dobles_cierre = r'\)\)'
 llave_apertura = r'\{'
 llave_cierre = r'\}'
 
-# Agregamos los nuevos patrones
 simbolos = {
     '=': r'=',
     '+': r'\+',
@@ -31,9 +28,8 @@ simbolos = {
 
 
 def analizar():
-    # Obtiene el texto del widget txt_input
     texto = txt_input.get("1.0", "end-1c")
-    txt_output.delete("1.0", tk.END)  # Limpia el cuadro de salida
+    txt_output.delete("1.0", tk.END)  # Clear the output area
 
     reservadas = re.findall(palabras_reservadas, texto)
     cadenas = re.findall(cadena, texto)
@@ -42,17 +38,11 @@ def analizar():
     punto_coma_encontrado = re.findall(punto_coma, texto)
     parentesis_apertura_encontrados = re.findall(parentesis_apertura, texto)
     parentesis_cierre_encontrados = re.findall(parentesis_cierre, texto)
-    parentesis_dobles_apertura_encontrados = re.findall(
-        parentesis_dobles_apertura, texto)
-    parentesis_dobles_cierre_encontrados = re.findall(
-        parentesis_dobles_cierre, texto)
     llave_apertura_encontradas = re.findall(llave_apertura, texto)
     llave_cierre_encontradas = re.findall(llave_cierre, texto)
 
     ids = [i for i in ids if i not in reservadas]
-
     reservadas = list(set(reservadas))
-
     vars = [i[1] for i in vars]
 
     simbolos_encontrados = set()
@@ -72,21 +62,18 @@ Paréntesis de cierre encontrados: {len(parentesis_cierre_encontrados)}
 Llaves de apertura encontradas: {len(llave_apertura_encontradas)}
 Llaves de cierre encontradas: {len(llave_cierre_encontradas)}"""
 
-    if parentesis_dobles_apertura_encontrados or parentesis_dobles_cierre_encontrados:
-        output += "\nLa sintaxis de los paréntesis dobles no es reconocida."
+    double_parentheses = re.findall(r'\(\(|\)\)', texto)
+    if double_parentheses:
+        output += f"\nParéntesis dobles nodefinidos: {', '.join(double_parentheses)}"
 
     txt_output.insert(tk.END, output)
 
-
 root = tk.Tk()
-root.geometry('700x500')  # Tamaño de la ventana
-
+root.geometry('700x500')
 txt_input = scrolledtext.ScrolledText(root, width=60, height=10)
 txt_input.pack()
-
 btn = tk.Button(root, text="Analizar texto", command=analizar)
 btn.pack()
-
 txt_output = scrolledtext.ScrolledText(root, width=80, height=10)
 txt_output.pack()
 
