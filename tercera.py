@@ -15,14 +15,25 @@ llave_apertura = r'\{'
 llave_cierre = r'\}'
 
 # Agregamos los nuevos patrones
-simbolo_igual = r'='
-simbolo_mas = r'\+'
-simbolo_menos = r'-'
-simbolo_multiplicacion = r'\*'
-simbolo_division = r'\/'
+simbolos = {
+    '=': r'=',
+    '+': r'\+',
+    '-': r'-',
+    '*': r'\*',
+    '/': r'\/',
+    '(': r'\(',
+    ')': r'\)',
+    '{': r'\{',
+    '}': r'\}',
+    ':': r':',
+    ';': r';',
+}
+
 
 def analizar():
-    texto = txt_input.get("1.0", "end-1c")  # Obtiene el texto del widget txt_input
+    # Obtiene el texto del widget txt_input
+    texto = txt_input.get("1.0", "end-1c")
+    txt_output.delete("1.0", tk.END)  # Limpia el cuadro de salida
 
     reservadas = re.findall(palabras_reservadas, texto)
     cadenas = re.findall(cadena, texto)
@@ -31,17 +42,12 @@ def analizar():
     punto_coma_encontrado = re.findall(punto_coma, texto)
     parentesis_apertura_encontrados = re.findall(parentesis_apertura, texto)
     parentesis_cierre_encontrados = re.findall(parentesis_cierre, texto)
-    parentesis_dobles_apertura_encontrados = re.findall(parentesis_dobles_apertura, texto)
-    parentesis_dobles_cierre_encontrados = re.findall(parentesis_dobles_cierre, texto)
+    parentesis_dobles_apertura_encontrados = re.findall(
+        parentesis_dobles_apertura, texto)
+    parentesis_dobles_cierre_encontrados = re.findall(
+        parentesis_dobles_cierre, texto)
     llave_apertura_encontradas = re.findall(llave_apertura, texto)
     llave_cierre_encontradas = re.findall(llave_cierre, texto)
-
-    # Buscamos los nuevos simbolos
-    simbolo_igual_encontrado = re.findall(simbolo_igual, texto)
-    simbolo_mas_encontrado = re.findall(simbolo_mas, texto)
-    simbolo_menos_encontrado = re.findall(simbolo_menos, texto)
-    simbolo_multiplicacion_encontrado = re.findall(simbolo_multiplicacion, texto)
-    simbolo_division_encontrado = re.findall(simbolo_division, texto)
 
     ids = [i for i in ids if i not in reservadas]
 
@@ -49,25 +55,28 @@ def analizar():
 
     vars = [i[1] for i in vars]
 
+    simbolos_encontrados = set()
+    for simbolo, patron in simbolos.items():
+        encontrado = re.findall(patron, texto)
+        if encontrado:
+            simbolos_encontrados.add(simbolo)
+
     output = f"""Palabras reservadas encontradas: {reservadas}
 Cadenas encontradas: {cadenas}
-IDs encontradas: {ids}
-Variables encontradas: {vars}
+IDs encontradas: {ids, vars}
+Símbolos encontrados: {', '.join(simbolos_encontrados)}
+
 Número de ';' encontrados: {len(punto_coma_encontrado)}
 Paréntesis de apertura encontrados: {len(parentesis_apertura_encontrados)}
 Paréntesis de cierre encontrados: {len(parentesis_cierre_encontrados)}
 Llaves de apertura encontradas: {len(llave_apertura_encontradas)}
-Llaves de cierre encontradas: {len(llave_cierre_encontradas)}
-Símbolo '=' encontrados: {len(simbolo_igual_encontrado)}
-Símbolo '+' encontrados: {len(simbolo_mas_encontrado)}
-Símbolo '-' encontrados: {len(simbolo_menos_encontrado)}
-Símbolo '*' encontrados: {len(simbolo_multiplicacion_encontrado)}
-Símbolo '/' encontrados: {len(simbolo_division_encontrado)}"""
+Llaves de cierre encontradas: {len(llave_cierre_encontradas)}"""
 
     if parentesis_dobles_apertura_encontrados or parentesis_dobles_cierre_encontrados:
         output += "\nLa sintaxis de los paréntesis dobles no es reconocida."
 
-    txt_output.insert(tk.END, output)  # Imprime el resultado en el widget txt_output
+    txt_output.insert(tk.END, output)
+
 
 root = tk.Tk()
 root.geometry('700x500')  # Tamaño de la ventana
@@ -82,4 +91,3 @@ txt_output = scrolledtext.ScrolledText(root, width=80, height=10)
 txt_output.pack()
 
 root.mainloop()
-
